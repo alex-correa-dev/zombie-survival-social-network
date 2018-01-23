@@ -1,0 +1,6 @@
+{
+  "MONGO_URL": "mongodb://127.0.0.1/zombie_survival_social_network",
+  "MONGO_URL_TEST": "mongodb://127.0.0.1/zombie_survival_social_network_test",
+  "SERVER_URL": "http://localhost:3002",
+  "SERVER_PORT": "3002"
+}
