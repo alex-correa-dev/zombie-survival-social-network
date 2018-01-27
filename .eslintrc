@@ -25,7 +25,11 @@
     "wrap-iife": 0,
     "strict": 0,
     "no-prototype-builtins": 0,
-    "import/no-dynamic-require": 0
+    "import/no-dynamic-require": 0,
+    "no-trailing-spaces": [ "error", {
+      "skipBlankLines": true,
+      "ignoreComments": true
+    }]
   },
   "globals": {
 
