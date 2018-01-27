@@ -19,7 +19,7 @@ describe('Post /api/survivor functional tests', () => {
   });
   
   context('Success cases:', () => {
-    it.only('Create a survivor by post', (done) => {
+    it('Create a survivor by post', (done) => {
       const survivorData = fixtures.survivors.createFixture();
       supertest(app)
         .post('/api/survivor')
