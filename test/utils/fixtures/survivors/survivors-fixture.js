@@ -26,7 +26,7 @@ function create(data = {}) {
   survivor.gender = data.gender || chance.gender();
   survivor.location = data.location || getLocation();
   survivor.inventory = data.inventory || getInventory();
-  survivor.infected = data.infected || chance.bool();
+  survivor.infected = typeof data.infected === 'boolean' ? data.infected : chance.bool();
   survivor.numInfectedNotification = typeof data.numInfectedNotification === 'number' ?
     data.numInfectedNotification :
     chance.natural({ min: 0, max: 3 });
