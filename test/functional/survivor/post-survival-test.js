@@ -76,7 +76,8 @@ describe('Post /api/survivor functional tests', () => {
     it('Should return an error because there is some problem at database', (done) => {
       const survivorData = fixtures.survivors.createFixture();
   
-      sinon.stub(survivorServices, 'createSurvivor').callsFake((arg1, cb) => cb(new Error()));
+      const fakeService = sinon.stub(survivorServices, 'createSurvivor')
+        .callsFake((arg1, cb) => cb(new Error()));
       sandbox.spy(logger, 'error');
       
       supertest(app)
@@ -89,6 +90,7 @@ describe('Post /api/survivor functional tests', () => {
           assert.isDefined(res.error);
           sinon.assert.calledOnce(survivorServices.createSurvivor);
           sinon.assert.calledWith(logger.error, 'Error creating survivor at post survivor. Err:');
+          fakeService.restore();
           done();
         });
     });
