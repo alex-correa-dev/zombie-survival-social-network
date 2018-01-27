@@ -40,7 +40,7 @@ describe('Post /api/survivor functional tests', () => {
         .send(survivorData)
         .end((err, res) => {
           assert.isNull(err);
-          assert.equal(httpStatus.okStatus, res.statusCode);
+          assert.equal(httpStatus.createdStatus, res.statusCode);
           
           const survivorCreated = res.body;
           assert.strictEqual(survivorData.name, survivorCreated.name);
