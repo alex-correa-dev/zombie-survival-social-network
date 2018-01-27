@@ -1,0 +1,54 @@
+{
+  "id": "survivor",
+  "description": "schema for a survivor entry",
+  "required": ["name", "age", "gender", "location", "infected"],
+  "properties": {
+    "_id": {
+      "type": "object"
+    },
+    "name":  {
+      "type": "string"
+    },
+    "age":  {
+      "type": "number"
+    },
+    "gender": {
+      "type": "string",
+      "enum": ["Female", "Male"]
+    },
+    "location": {
+      "type": "object",
+      "required":["latitude", "longitude"],
+      "properties": {
+        "latitude": {
+          "type": "number"
+        },
+        "longitude": {
+          "type": "number"
+        }
+      }
+    },
+    "inventory": {
+      "properties": {
+        "water": {
+          "type": "number"
+        },
+        "food": {
+          "type": "number"
+        },
+        "medication": {
+          "type": "number"
+        },
+        "ammunition": {
+          "type": "number"
+        }
+      }
+    },
+    "infected": {
+      "type": "boolean"
+    },
+    "numInfectedNotification": {
+      "type": "number"
+    }
+  }
+}
