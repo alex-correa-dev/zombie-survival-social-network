@@ -1,5 +1,6 @@
 const ROOT_PATH = process.cwd();
 const logger = require('winston');
+
 const app = require(`${ROOT_PATH}/lib/application`);
 const config = require(`${ROOT_PATH}/lib/config`);
 const database = require(`${ROOT_PATH}/lib/commons/db`);
@@ -20,23 +21,26 @@ const shutdown = () => {
 };
 
 process.on('SIGTERM', shutdown)
-.on('SIGINT', shutdown)
-.on('SIGHUP', shutdown)
-.on('uncaughtException', (er) => {
-  logger.error(`uncaughtException caught the error: ${er.message}`);
-  throw er;
-})
-.on('exit', (code) => {
-  logger.info('Node process exit with code:', code);
-  database.close();
-});
+  .on('SIGINT', shutdown)
+  .on('SIGHUP', shutdown)
+  .on('uncaughtException', (er) => {
+    logger.error(`uncaughtException caught the error: ${er.message}`);
+    throw er;
+  })
+  .on('exit', (code) => {
+    logger.info('Node process exit with code:', code);
+    database.close();
+  });
 
 const server = app.listen(config.get('SERVER_PORT'), (err) => {
   if (err) {
     logger.error('Error on listening port. ', err.message);
   }
-  logger.info('Server starting at %s:%s.',
-    server.address().address, server.address().port);
+  
+  logger.info(
+    'Server starting at %s:%s.',
+    server.address().address, server.address().port
+  );
   
   server.on('close', () => {
     logger.info('Shutdown the application server');
