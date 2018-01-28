@@ -165,46 +165,684 @@ describe('Patch /api/survivor/survivor1_id/survivor2_id/trade functional tests',
   });
   
   context('Error cases:', () => {
-    it.only('Should return an error because first survivor is infected', (done) => {
-      done();
+    it('Should return an error because first survivor is infected', (done) => {
+      const firstSurvivorData = {
+        infected: true,
+        numInfectedNotification: 3
+      };
+  
+      const secondSurvivorData = {
+        infected: false,
+        numInfectedNotification: 0
+      };
+  
+      async.series([
+        function(callback) {
+          fixtures.survivors.populate(firstSurvivorData, callback);
+        },
+        function(callback) {
+          fixtures.survivors.populate(secondSurvivorData, callback);
+        }
+      ], (errPopulate, survivors) => {
+        assert.isNull(errPopulate);
+  
+        const firstSurvivorIndex = 0;
+        const secondSurvivorIndex = 1;
+        const firstSurvivorCreated = survivors[firstSurvivorIndex];
+        const secondSurvivorCreated = survivors[secondSurvivorIndex];
+  
+        const firstSurvivorId = firstSurvivorCreated._id.toString();
+        const secondSurvivorId = secondSurvivorCreated._id.toString();
+  
+        const tradeData = {
+          giveToMe: {
+            ammunition: 6,
+            food: 2
+          },
+          receiveToYou: {
+            water: 1,
+            medication: 4
+          }
+        };
+        
+        sandbox.spy(logger, 'error');
+  
+        supertest(app)
+          .patch(`/api/survivor/${firstSurvivorId}/${secondSurvivorId}/trade`)
+          .send(tradeData)
+          .end((err, res) => {
+            assert.isNull(err);
+            assert.equal(httpStatus.badRequestStatus, res.statusCode);
+  
+            const expectedMessage =
+              `Could not trade between survivors: ${firstSurvivorCreated.name} is infected`;
+            assert.strictEqual(expectedMessage, res.text);
+            sinon.assert.calledWith(logger.error, expectedMessage);
+            done();
+          });
+      });
     });
   
     it('Should return an error because second survivor is infected', (done) => {
-      done();
+      const firstSurvivorData = {
+        infected: false,
+        numInfectedNotification: 0
+      };
+  
+      const secondSurvivorData = {
+        infected: true,
+        numInfectedNotification: 3
+      };
+  
+      async.series([
+        function(callback) {
+          fixtures.survivors.populate(firstSurvivorData, callback);
+        },
+        function(callback) {
+          fixtures.survivors.populate(secondSurvivorData, callback);
+        }
+      ], (errPopulate, survivors) => {
+        assert.isNull(errPopulate);
+    
+        const firstSurvivorIndex = 0;
+        const secondSurvivorIndex = 1;
+        const firstSurvivorCreated = survivors[firstSurvivorIndex];
+        const secondSurvivorCreated = survivors[secondSurvivorIndex];
+    
+        const firstSurvivorId = firstSurvivorCreated._id.toString();
+        const secondSurvivorId = secondSurvivorCreated._id.toString();
+    
+        const tradeData = {
+          giveToMe: {
+            ammunition: 6,
+            food: 2
+          },
+          receiveToYou: {
+            water: 1,
+            medication: 4
+          }
+        };
+    
+        sandbox.spy(logger, 'error');
+    
+        supertest(app)
+          .patch(`/api/survivor/${firstSurvivorId}/${secondSurvivorId}/trade`)
+          .send(tradeData)
+          .end((err, res) => {
+            assert.isNull(err);
+            assert.equal(httpStatus.badRequestStatus, res.statusCode);
+        
+            const expectedMessage =
+              `Could not trade between survivors: ${secondSurvivorCreated.name} is infected`;
+            assert.strictEqual(expectedMessage, res.text);
+            sinon.assert.calledWith(logger.error, expectedMessage);
+            done();
+          });
+      });
     });
   
     it('Should return an error because there is some problem at database when ' +
       'survivorsModel.findOne is called', (done) => {
-      done();
+      const firstSurvivorData = {
+        infected: false,
+        numInfectedNotification: 0,
+        inventory: {
+          water: 2,
+          medication: 6,
+          ammunition: 1,
+          food: 1
+        }
+      };
+  
+      const secondSurvivorData = {
+        infected: false,
+        numInfectedNotification: 0,
+        inventory: {
+          ammunition: 6,
+          food: 10,
+          water: 1,
+          medication: 5,
+        }
+      };
+  
+      async.series([
+        function(callback) {
+          fixtures.survivors.populate(firstSurvivorData, callback);
+        },
+        function(callback) {
+          fixtures.survivors.populate(secondSurvivorData, callback);
+        }
+      ], (errPopulate, survivors) => {
+        assert.isNull(errPopulate);
+    
+        const firstSurvivorIndex = 0;
+        const secondSurvivorIndex = 1;
+        const firstSurvivorCreated = survivors[firstSurvivorIndex];
+        const secondSurvivorCreated = survivors[secondSurvivorIndex];
+    
+        const firstSurvivorId = firstSurvivorCreated._id.toString();
+        const secondSurvivorId = secondSurvivorCreated._id.toString();
+    
+        const tradeData = {
+          giveToMe: {
+            ammunition: 6,
+            food: 2
+          },
+          receiveToYou: {
+            water: 1,
+            medication: 4
+          }
+        };
+  
+        const error = new Error();
+        const fakeModel = sinon.stub(survivorsModel, 'findOne').callsFake((arg1, arg2, cb) => cb(error));
+        sandbox.spy(logger, 'error');
+    
+        supertest(app)
+          .patch(`/api/survivor/${firstSurvivorId}/${secondSurvivorId}/trade`)
+          .send(tradeData)
+          .end((err, res) => {
+            assert.isNull(err);
+            assert.equal(httpStatus.internalServerErrorStatus, res.statusCode);
+  
+            const expectedMessage = `Error finding survivors. ${error}`;
+            assert.strictEqual(expectedMessage, res.text);
+            sinon.assert.calledOnce(survivorsModel.findOne);
+            sinon.assert.calledWith(logger.error, expectedMessage);
+            fakeModel.restore();
+            
+            done();
+          });
+      });
     });
   
     it('Should return an error because tradeData.giveToMe was not sended', (done) => {
-      done();
+      const firstSurvivorData = {
+        infected: false,
+        numInfectedNotification: 0,
+        inventory: {
+          water: 2,
+          medication: 6,
+          ammunition: 1,
+          food: 1
+        }
+      };
+  
+      const secondSurvivorData = {
+        infected: false,
+        numInfectedNotification: 0,
+        inventory: {
+          ammunition: 6,
+          food: 10,
+          water: 1,
+          medication: 5,
+        }
+      };
+  
+      async.series([
+        function(callback) {
+          fixtures.survivors.populate(firstSurvivorData, callback);
+        },
+        function(callback) {
+          fixtures.survivors.populate(secondSurvivorData, callback);
+        }
+      ], (errPopulate, survivors) => {
+        assert.isNull(errPopulate);
+    
+        const firstSurvivorIndex = 0;
+        const secondSurvivorIndex = 1;
+        const firstSurvivorCreated = survivors[firstSurvivorIndex];
+        const secondSurvivorCreated = survivors[secondSurvivorIndex];
+    
+        const firstSurvivorId = firstSurvivorCreated._id.toString();
+        const secondSurvivorId = secondSurvivorCreated._id.toString();
+    
+        const tradeData = {
+          receiveToYou: {
+            water: 1,
+            medication: 4
+          }
+        };
+    
+        sandbox.spy(logger, 'error');
+    
+        supertest(app)
+          .patch(`/api/survivor/${firstSurvivorId}/${secondSurvivorId}/trade`)
+          .send(tradeData)
+          .end((err, res) => {
+            assert.isNull(err);
+            assert.equal(httpStatus.badRequestStatus, res.statusCode);
+        
+            const expectedMessage = 'Data to trade is no correct: giveToMe and receiveToYou are required';
+            assert.strictEqual(expectedMessage, res.text);
+            sinon.assert.calledWith(logger.error, expectedMessage);
+        
+            done();
+          });
+      });
     });
   
     it('Should return an error because tradeData.receiveToYou was not sended', (done) => {
-      done();
+      const firstSurvivorData = {
+        infected: false,
+        numInfectedNotification: 0,
+        inventory: {
+          water: 2,
+          medication: 6,
+          ammunition: 1,
+          food: 1
+        }
+      };
+  
+      const secondSurvivorData = {
+        infected: false,
+        numInfectedNotification: 0,
+        inventory: {
+          ammunition: 6,
+          food: 10,
+          water: 1,
+          medication: 5,
+        }
+      };
+  
+      async.series([
+        function(callback) {
+          fixtures.survivors.populate(firstSurvivorData, callback);
+        },
+        function(callback) {
+          fixtures.survivors.populate(secondSurvivorData, callback);
+        }
+      ], (errPopulate, survivors) => {
+        assert.isNull(errPopulate);
+    
+        const firstSurvivorIndex = 0;
+        const secondSurvivorIndex = 1;
+        const firstSurvivorCreated = survivors[firstSurvivorIndex];
+        const secondSurvivorCreated = survivors[secondSurvivorIndex];
+    
+        const firstSurvivorId = firstSurvivorCreated._id.toString();
+        const secondSurvivorId = secondSurvivorCreated._id.toString();
+    
+        const tradeData = {
+          giveToMe: {
+            ammunition: 6,
+            food: 2
+          }
+        };
+    
+        sandbox.spy(logger, 'error');
+    
+        supertest(app)
+          .patch(`/api/survivor/${firstSurvivorId}/${secondSurvivorId}/trade`)
+          .send(tradeData)
+          .end((err, res) => {
+            assert.isNull(err);
+            assert.equal(httpStatus.badRequestStatus, res.statusCode);
+        
+            const expectedMessage = 'Data to trade is no correct: giveToMe and receiveToYou are required';
+            assert.strictEqual(expectedMessage, res.text);
+            sinon.assert.calledWith(logger.error, expectedMessage);
+        
+            done();
+          });
+      });
     });
   
     it('Should return an error because tradeData.giveToMe is empty', (done) => {
-      done();
+      const firstSurvivorData = {
+        infected: false,
+        numInfectedNotification: 0,
+        inventory: {
+          water: 2,
+          medication: 6,
+          ammunition: 1,
+          food: 1
+        }
+      };
+  
+      const secondSurvivorData = {
+        infected: false,
+        numInfectedNotification: 0,
+        inventory: {
+          ammunition: 6,
+          food: 10,
+          water: 1,
+          medication: 5,
+        }
+      };
+  
+      async.series([
+        function(callback) {
+          fixtures.survivors.populate(firstSurvivorData, callback);
+        },
+        function(callback) {
+          fixtures.survivors.populate(secondSurvivorData, callback);
+        }
+      ], (errPopulate, survivors) => {
+        assert.isNull(errPopulate);
+    
+        const firstSurvivorIndex = 0;
+        const secondSurvivorIndex = 1;
+        const firstSurvivorCreated = survivors[firstSurvivorIndex];
+        const secondSurvivorCreated = survivors[secondSurvivorIndex];
+    
+        const firstSurvivorId = firstSurvivorCreated._id.toString();
+        const secondSurvivorId = secondSurvivorCreated._id.toString();
+  
+        const tradeData = {
+          giveToMe: {},
+          receiveToYou: {
+            water: 1,
+            medication: 4
+          }
+        };
+    
+        sandbox.spy(logger, 'error');
+    
+        supertest(app)
+          .patch(`/api/survivor/${firstSurvivorId}/${secondSurvivorId}/trade`)
+          .send(tradeData)
+          .end((err, res) => {
+            assert.isNull(err);
+            assert.equal(httpStatus.badRequestStatus, res.statusCode);
+        
+            const expectedMessage = 'Data to trade is no correct: giveToMe and receiveToYou must ' +
+              'have ammunition, food, water or medication';
+            assert.strictEqual(expectedMessage, res.text);
+            sinon.assert.calledWith(logger.error, expectedMessage);
+        
+            done();
+          });
+      });
     });
   
     it('Should return an error because tradeData.receiveToYou is empty', (done) => {
-      done();
+      const firstSurvivorData = {
+        infected: false,
+        numInfectedNotification: 0,
+        inventory: {
+          water: 2,
+          medication: 6,
+          ammunition: 1,
+          food: 1
+        }
+      };
+  
+      const secondSurvivorData = {
+        infected: false,
+        numInfectedNotification: 0,
+        inventory: {
+          ammunition: 6,
+          food: 10,
+          water: 1,
+          medication: 5,
+        }
+      };
+  
+      async.series([
+        function(callback) {
+          fixtures.survivors.populate(firstSurvivorData, callback);
+        },
+        function(callback) {
+          fixtures.survivors.populate(secondSurvivorData, callback);
+        }
+      ], (errPopulate, survivors) => {
+        assert.isNull(errPopulate);
+    
+        const firstSurvivorIndex = 0;
+        const secondSurvivorIndex = 1;
+        const firstSurvivorCreated = survivors[firstSurvivorIndex];
+        const secondSurvivorCreated = survivors[secondSurvivorIndex];
+    
+        const firstSurvivorId = firstSurvivorCreated._id.toString();
+        const secondSurvivorId = secondSurvivorCreated._id.toString();
+  
+        const tradeData = {
+          giveToMe: {
+            ammunition: 6,
+            food: 2
+          },
+          receiveToYou: {}
+        };
+    
+        sandbox.spy(logger, 'error');
+    
+        supertest(app)
+          .patch(`/api/survivor/${firstSurvivorId}/${secondSurvivorId}/trade`)
+          .send(tradeData)
+          .end((err, res) => {
+            assert.isNull(err);
+            assert.equal(httpStatus.badRequestStatus, res.statusCode);
+        
+            const expectedMessage = 'Data to trade is no correct: giveToMe and receiveToYou must ' +
+              'have ammunition, food, water or medication';
+            assert.strictEqual(expectedMessage, res.text);
+            sinon.assert.calledWith(logger.error, expectedMessage);
+        
+            done();
+          });
+      });
     });
   
     it('Should return an error because the supplies points are not the same', (done) => {
-      done();
+      const firstSurvivorData = {
+        infected: false,
+        numInfectedNotification: 0,
+        inventory: {
+          water: 2,
+          medication: 6,
+          ammunition: 1,
+          food: 1
+        }
+      };
+  
+      const secondSurvivorData = {
+        infected: false,
+        numInfectedNotification: 0,
+        inventory: {
+          ammunition: 6,
+          food: 10,
+          water: 1,
+          medication: 5,
+        }
+      };
+  
+      async.series([
+        function(callback) {
+          fixtures.survivors.populate(firstSurvivorData, callback);
+        },
+        function(callback) {
+          fixtures.survivors.populate(secondSurvivorData, callback);
+        }
+      ], (errPopulate, survivors) => {
+        assert.isNull(errPopulate);
+    
+        const firstSurvivorIndex = 0;
+        const secondSurvivorIndex = 1;
+        const firstSurvivorCreated = survivors[firstSurvivorIndex];
+        const secondSurvivorCreated = survivors[secondSurvivorIndex];
+    
+        const firstSurvivorId = firstSurvivorCreated._id.toString();
+        const secondSurvivorId = secondSurvivorCreated._id.toString();
+  
+        const tradeData = {
+          giveToMe: {
+            ammunition: 7,
+            food: 2
+          },
+          receiveToYou: {
+            water: 5,
+            medication: 4
+          }
+        };
+    
+        sandbox.spy(logger, 'error');
+    
+        supertest(app)
+          .patch(`/api/survivor/${firstSurvivorId}/${secondSurvivorId}/trade`)
+          .send(tradeData)
+          .end((err, res) => {
+            assert.isNull(err);
+            assert.equal(httpStatus.badRequestStatus, res.statusCode);
+        
+            const expectedMessage =
+              'It was not possible trade between survivors: points of supplies are not the same';
+            assert.strictEqual(expectedMessage, res.text);
+            sinon.assert.calledWith(logger.error, expectedMessage);
+        
+            done();
+          });
+      });
     });
   
     it('Should return an error because the supplies of both survivors are not sufficient', (done) => {
-      done();
+      const firstSurvivorData = {
+        infected: false,
+        numInfectedNotification: 0,
+        inventory: {
+          water: 0,
+          medication: 2,
+          ammunition: 1,
+          food: 1
+        }
+      };
+  
+      const secondSurvivorData = {
+        infected: false,
+        numInfectedNotification: 0,
+        inventory: {
+          ammunition: 0,
+          food: 1,
+          water: 1,
+          medication: 5,
+        }
+      };
+  
+      async.series([
+        function(callback) {
+          fixtures.survivors.populate(firstSurvivorData, callback);
+        },
+        function(callback) {
+          fixtures.survivors.populate(secondSurvivorData, callback);
+        }
+      ], (errPopulate, survivors) => {
+        assert.isNull(errPopulate);
+    
+        const firstSurvivorIndex = 0;
+        const secondSurvivorIndex = 1;
+        const firstSurvivorCreated = survivors[firstSurvivorIndex];
+        const secondSurvivorCreated = survivors[secondSurvivorIndex];
+    
+        const firstSurvivorId = firstSurvivorCreated._id.toString();
+        const secondSurvivorId = secondSurvivorCreated._id.toString();
+  
+        const tradeData = {
+          giveToMe: {
+            ammunition: 6,
+            food: 2
+          },
+          receiveToYou: {
+            water: 1,
+            medication: 4
+          }
+        };
+    
+        sandbox.spy(logger, 'error');
+    
+        supertest(app)
+          .patch(`/api/survivor/${firstSurvivorId}/${secondSurvivorId}/trade`)
+          .send(tradeData)
+          .end((err, res) => {
+            assert.isNull(err);
+            assert.equal(httpStatus.badRequestStatus, res.statusCode);
+        
+            const expectedMessage = 'Error trading supplies. Details:\n' +
+              'receiveToYou.water: 1 - survivor: 0\n' +
+              'receiveToYou.medication: 4 - survivor: 2\n' +
+              'giveToMe.ammunition: 6 - survivor: 0\n' +
+              'giveToMe.food: 2 - survivor: 1\n';
+            assert.strictEqual(expectedMessage, res.text);
+            sinon.assert.calledWith(logger.error, expectedMessage);
+        
+            done();
+          });
+      });
     });
   
     it('Should return an error because there is some problem at database when ' +
       'survivorServices.updateSurvivorInventory is called', (done) => {
-      done();
+      const firstSurvivorData = {
+        infected: false,
+        numInfectedNotification: 0,
+        inventory: {
+          water: 2,
+          medication: 6,
+          ammunition: 1,
+          food: 1
+        }
+      };
+  
+      const secondSurvivorData = {
+        infected: false,
+        numInfectedNotification: 0,
+        inventory: {
+          ammunition: 6,
+          food: 10,
+          water: 1,
+          medication: 5,
+        }
+      };
+  
+      async.series([
+        function(callback) {
+          fixtures.survivors.populate(firstSurvivorData, callback);
+        },
+        function(callback) {
+          fixtures.survivors.populate(secondSurvivorData, callback);
+        }
+      ], (errPopulate, survivors) => {
+        assert.isNull(errPopulate);
+    
+        const firstSurvivorIndex = 0;
+        const secondSurvivorIndex = 1;
+        const firstSurvivorCreated = survivors[firstSurvivorIndex];
+        const secondSurvivorCreated = survivors[secondSurvivorIndex];
+    
+        const firstSurvivorId = firstSurvivorCreated._id.toString();
+        const secondSurvivorId = secondSurvivorCreated._id.toString();
+    
+        const tradeData = {
+          giveToMe: {
+            ammunition: 6,
+            food: 2
+          },
+          receiveToYou: {
+            water: 1,
+            medication: 4
+          }
+        };
+  
+        const error = new Error();
+        const fakeService = sinon.stub(survivorServices, 'updateSurvivorInventory')
+          .callsFake((arg1, arg2, cb) => cb(error));
+        sandbox.spy(logger, 'error');
+    
+        supertest(app)
+          .patch(`/api/survivor/${firstSurvivorId}/${secondSurvivorId}/trade`)
+          .send(tradeData)
+          .end((err, res) => {
+            assert.isNull(err);
+            assert.equal(httpStatus.internalServerErrorStatus, res.statusCode);
+        
+            const expectedMessage = `Error trade supplies. Err: ${error}`;
+            assert.strictEqual(expectedMessage, res.text);
+            sinon.assert.calledOnce(survivorServices.updateSurvivorInventory);
+            sinon.assert.calledWith(logger.error, expectedMessage);
+            fakeService.restore();
+        
+            done();
+          });
+      });
     });
   });
 });
