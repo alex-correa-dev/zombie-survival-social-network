@@ -58,10 +58,10 @@ describe('Patch /api/survivor/survivor1_id/survivor2_id/trade functional tests',
       };
   
       async.series([
-        function(callback) {
+        (callback) => {
           fixtures.survivors.populate(firstSurvivorData, callback);
         },
-        function(callback) {
+        (callback) => {
           fixtures.survivors.populate(secondSurvivorData, callback);
         }
       ], (errPopulate, survivors) => {
@@ -94,10 +94,10 @@ describe('Patch /api/survivor/survivor1_id/survivor2_id/trade functional tests',
             assert.equal(httpStatus.okStatus, res.statusCode);
   
             async.series([
-              function(callback) {
+              (callback) => {
                 survivorsModel.findOne({ _id: new ObjectID(firstSurvivorId) }, undefined, callback);
               },
-              function(callback) {
+              (callback) => {
                 survivorsModel.findOne({ _id: new ObjectID(secondSurvivorId) }, undefined, callback);
               }
             ], (errFind, survivorsUpdated) => {
@@ -177,10 +177,10 @@ describe('Patch /api/survivor/survivor1_id/survivor2_id/trade functional tests',
       };
   
       async.series([
-        function(callback) {
+        (callback) => {
           fixtures.survivors.populate(firstSurvivorData, callback);
         },
-        function(callback) {
+        (callback) => {
           fixtures.survivors.populate(secondSurvivorData, callback);
         }
       ], (errPopulate, survivors) => {
@@ -235,10 +235,10 @@ describe('Patch /api/survivor/survivor1_id/survivor2_id/trade functional tests',
       };
   
       async.series([
-        function(callback) {
+        (callback) => {
           fixtures.survivors.populate(firstSurvivorData, callback);
         },
-        function(callback) {
+        (callback) => {
           fixtures.survivors.populate(secondSurvivorData, callback);
         }
       ], (errPopulate, survivors) => {
@@ -306,10 +306,10 @@ describe('Patch /api/survivor/survivor1_id/survivor2_id/trade functional tests',
       };
   
       async.series([
-        function(callback) {
+        (callback) => {
           fixtures.survivors.populate(firstSurvivorData, callback);
         },
-        function(callback) {
+        (callback) => {
           fixtures.survivors.populate(secondSurvivorData, callback);
         }
       ], (errPopulate, survivors) => {
@@ -380,10 +380,10 @@ describe('Patch /api/survivor/survivor1_id/survivor2_id/trade functional tests',
       };
   
       async.series([
-        function(callback) {
+        (callback) => {
           fixtures.survivors.populate(firstSurvivorData, callback);
         },
-        function(callback) {
+        (callback) => {
           fixtures.survivors.populate(secondSurvivorData, callback);
         }
       ], (errPopulate, survivors) => {
@@ -446,10 +446,10 @@ describe('Patch /api/survivor/survivor1_id/survivor2_id/trade functional tests',
       };
   
       async.series([
-        function(callback) {
+        (callback) => {
           fixtures.survivors.populate(firstSurvivorData, callback);
         },
-        function(callback) {
+        (callback) => {
           fixtures.survivors.populate(secondSurvivorData, callback);
         }
       ], (errPopulate, survivors) => {
@@ -512,10 +512,10 @@ describe('Patch /api/survivor/survivor1_id/survivor2_id/trade functional tests',
       };
   
       async.series([
-        function(callback) {
+        (callback) => {
           fixtures.survivors.populate(firstSurvivorData, callback);
         },
-        function(callback) {
+        (callback) => {
           fixtures.survivors.populate(secondSurvivorData, callback);
         }
       ], (errPopulate, survivors) => {
@@ -580,10 +580,10 @@ describe('Patch /api/survivor/survivor1_id/survivor2_id/trade functional tests',
       };
   
       async.series([
-        function(callback) {
+        (callback) => {
           fixtures.survivors.populate(firstSurvivorData, callback);
         },
-        function(callback) {
+        (callback) => {
           fixtures.survivors.populate(secondSurvivorData, callback);
         }
       ], (errPopulate, survivors) => {
@@ -648,10 +648,10 @@ describe('Patch /api/survivor/survivor1_id/survivor2_id/trade functional tests',
       };
   
       async.series([
-        function(callback) {
+        (callback) => {
           fixtures.survivors.populate(firstSurvivorData, callback);
         },
-        function(callback) {
+        (callback) => {
           fixtures.survivors.populate(secondSurvivorData, callback);
         }
       ], (errPopulate, survivors) => {
@@ -719,10 +719,10 @@ describe('Patch /api/survivor/survivor1_id/survivor2_id/trade functional tests',
       };
   
       async.series([
-        function(callback) {
+        (callback) => {
           fixtures.survivors.populate(firstSurvivorData, callback);
         },
-        function(callback) {
+        (callback) => {
           fixtures.survivors.populate(secondSurvivorData, callback);
         }
       ], (errPopulate, survivors) => {
@@ -794,10 +794,10 @@ describe('Patch /api/survivor/survivor1_id/survivor2_id/trade functional tests',
       };
   
       async.series([
-        function(callback) {
+        (callback) => {
           fixtures.survivors.populate(firstSurvivorData, callback);
         },
-        function(callback) {
+        (callback) => {
           fixtures.survivors.populate(secondSurvivorData, callback);
         }
       ], (errPopulate, survivors) => {

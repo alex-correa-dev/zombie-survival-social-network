@@ -78,16 +78,16 @@ describe('GET /api/survivors/reports tests', () => {
       };
   
       async.series([
-        function(callback) {
+        (callback) => {
           fixtures.survivors.populate(firstSurvivorData, callback);
         },
-        function(callback) {
+        (callback) => {
           fixtures.survivors.populate(secondSurvivorData, callback);
         },
-        function(callback) {
+        (callback) => {
           fixtures.survivors.populate(firstInfectedData, callback);
         },
-        function(callback) {
+        (callback) => {
           fixtures.survivors.populate(secondInfectedData, callback);
         }
       ], (errPopulate) => {
@@ -184,16 +184,16 @@ describe('GET /api/survivors/reports tests', () => {
       };
   
       async.series([
-        function(callback) {
+        (callback) => {
           fixtures.survivors.populate(firstSurvivorData, callback);
         },
-        function(callback) {
+        (callback) => {
           fixtures.survivors.populate(secondSurvivorData, callback);
         },
-        function(callback) {
+        (callback) => {
           fixtures.survivors.populate(firstInfectedData, callback);
         },
-        function(callback) {
+        (callback) => {
           fixtures.survivors.populate(secondInfectedData, callback);
         }
       ], (errPopulate) => {
