@@ -32,7 +32,7 @@ npm install
 
 In the Zombie Survival Social Network application, we deal with it using APIs, for example, we can _Post_ a survivor, update his/her location,
 notify if he/she is infected, trade supplies between survivors and get their reports. We use [Apiary](https://apiary.io/) as tool to describe 
-each API in detail and we can check it out in this [link](https://zombiesurvivorsocialnetwork.docs.apiary.io/#);
+each API in detail and we can check it out in this [link](https://zombiesurvivorsocialnetwork.docs.apiary.io/#).
 
 So, to run the application, enter the folder:
 
